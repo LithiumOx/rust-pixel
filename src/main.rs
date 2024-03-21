@@ -79,6 +79,14 @@ async fn get_canvas(client: &Client) -> Canvas {
     canvas
 }
 
+async fn clear_canvas(client: &Client, canvas: &Canvas) {
+    for pixel in canvas.pixels.iter() {
+        if pixel.color != [255, 255, 255] {
+            send_pixel(create_pixel(pixel.x, pixel.y, [255, 255, 255]), &client).await;
+        }
+    }
+}
+
 async fn send_pixel(p: Pixel, client: &Client) {
     let pixel = json!({
         "x": p.x,
@@ -110,17 +118,16 @@ async fn main() {
     let width = 200;
     // let mut rng = rand::thread_rng();
     let mut x = 0;
-    let mut y = 200;
+    let mut y = 153;
     loop {
-        if x == width {
+        if x % width == 0 && x != 0 {
             x = 0;
-            y -= 1;
+            y += 1;
         }
         if y == height {
             break;
         }
-        let color = [255, 255, 255];
-        send_pixel(create_pixel(x, y, color), &client).await;
+        send_pixel(create_pixel(x, y, [255, 255, 255]), &client).await;
         // sleep(Duration::from_millis(80));
         x += 1;
     }
